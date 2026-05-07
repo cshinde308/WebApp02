@@ -290,7 +290,7 @@ if page == "Activity Tracker":
         tab_settings = tabs[4]
 
     # ---------- PROJECT DASHBOARD ----------
-        with tab_project_dashboard:
+    with tab_project_dashboard:
         st.subheader("📊 Project Dashboard")
 
         # -----------------------------
