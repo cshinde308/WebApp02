@@ -290,7 +290,7 @@ if page == "Activity Tracker":
         tab_settings = tabs[4]
 
     # ---------- PROJECT DASHBOARD ----------
-    with tab_project_dashboard:
+        with tab_project_dashboard:
         st.subheader("📊 Project Dashboard")
 
         # -----------------------------
@@ -351,106 +351,107 @@ if page == "Activity Tracker":
         # -------------------------------------------------
         if not data:
             st.info("No activity data found for selected date range.")
-            st.stop()
+        else:
+            # Everything below MUST be inside this else block
 
-        # -------------------------------------------------
-        # CREATE DATAFRAME
-        # -------------------------------------------------
-        df = pd.DataFrame(data)
+            # -------------------------------------------------
+            # CREATE DATAFRAME
+            # -------------------------------------------------
+            df = pd.DataFrame(data)
 
-        # -------------------------------------------------
-        # PROJECT FILTER (NOW BASED ON CORRECT DATA)
-        # -------------------------------------------------
-        selected_project = col3.selectbox(
-            "Select Project",
-            sorted(df["project"].dropna().unique())
-        )
+            # -------------------------------------------------
+            # PROJECT FILTER (NOW BASED ON CORRECT DATA)
+            # -------------------------------------------------
+            selected_project = col3.selectbox(
+                "Select Project",
+                sorted(df["project"].dropna().unique())
+            )
 
-        # -------------------------------------------------
-        # APPLY PROJECT + DATE FILTER
-        # -------------------------------------------------
-        df = df[
-            (df["project"] == selected_project)
-        ]
+            # -------------------------------------------------
+            # APPLY PROJECT + DATE FILTER
+            # -------------------------------------------------
+            df = df[
+                (df["project"] == selected_project)
+            ]
 
-        if df.empty:
-            st.warning("No data found for selected project and date range.")
-            st.stop()
+            if df.empty:
+                st.warning("No data found for selected project and date range.")
+            else:
 
-        st.divider()
-
-        # -------------------------------------------------
-        # KPI SUMMARY
-        # -------------------------------------------------
-        total_hours = df["hours"].sum()
-        engineer_count = df["engineer"].nunique()
-
-        c1, c2 = st.columns(2)
-        c1.metric("🕒 Total Hours Booked", f"{total_hours:.2f} h")
-        c2.metric("👷 Engineers Involved", engineer_count)
-
-        st.divider()
-
-        # -------------------------------------------------
-        # ENGINEER CONTRIBUTION (PIE)
-        # -------------------------------------------------
-        eng_hours = (
-            df.groupby("engineer", as_index=False)["hours"]
-            .sum()
-            .sort_values("hours", ascending=False)
-        )
-
-        st.subheader("🍰 Engineers Contribution (Pie Chart)")
-
-        pie_df = eng_hours.set_index("engineer")
-
-        st.plotly_chart(
-            {
-                "data": [{
-                    "labels": pie_df.index,
-                    "values": pie_df["hours"],
-                    "type": "pie",
-                    "hole": 0.4,
-                    "textinfo": "label+percent",
-                    "textposition": "inside"
-                }],
-                "layout": {
-                    "title": "Engineer Contribution by Hours",
-                    "showlegend": True,
-                    "height": 450
-                }
-            },
-            use_container_width=True
-        )
-
-        st.divider()
-
-        # -------------------------------------------------
-        # ENGINEER CONTRIBUTION TABLE
-        # -------------------------------------------------
-        eng_hours["Contribution %"] = (
-                eng_hours["hours"] / total_hours * 100
-        ).round(1)
-
-        eng_hours.rename(
-            columns={
-                "engineer": "Engineer",
-                "hours": "Hours"
-            },
-            inplace=True
-        )
-
-        st.subheader("📋 Engineer-wise Breakdown")
-        st.dataframe(
-            eng_hours,
-            use_container_width=True,
-            hide_index=True
-        )
-
-        st.caption(
-            f"Dashboard data shown from {start_date} to {end_date} "
-            f"across year sheets {start_year}–{end_year}."
-        )
+                st.divider()
+    
+                # -------------------------------------------------
+                # KPI SUMMARY
+                # -------------------------------------------------
+                total_hours = df["hours"].sum()
+                engineer_count = df["engineer"].nunique()
+    
+                c1, c2 = st.columns(2)
+                c1.metric("🕒 Total Hours Booked", f"{total_hours:.2f} h")
+                c2.metric("👷 Engineers Involved", engineer_count)
+    
+                st.divider()
+    
+                # -------------------------------------------------
+                # ENGINEER CONTRIBUTION (PIE)
+                # -------------------------------------------------
+                eng_hours = (
+                    df.groupby("engineer", as_index=False)["hours"]
+                    .sum()
+                    .sort_values("hours", ascending=False)
+                )
+    
+                st.subheader("🍰 Engineers Contribution (Pie Chart)")
+    
+                pie_df = eng_hours.set_index("engineer")
+    
+                st.plotly_chart(
+                    {
+                        "data": [{
+                            "labels": pie_df.index,
+                            "values": pie_df["hours"],
+                            "type": "pie",
+                            "hole": 0.4,
+                            "textinfo": "label+percent",
+                            "textposition": "inside"
+                        }],
+                        "layout": {
+                            "title": "Engineer Contribution by Hours",
+                            "showlegend": True,
+                            "height": 450
+                        }
+                    },
+                    use_container_width=True
+                )
+    
+                st.divider()
+    
+                # -------------------------------------------------
+                # ENGINEER CONTRIBUTION TABLE
+                # -------------------------------------------------
+                eng_hours["Contribution %"] = (
+                        eng_hours["hours"] / total_hours * 100
+                ).round(1)
+    
+                eng_hours.rename(
+                    columns={
+                        "engineer": "Engineer",
+                        "hours": "Hours"
+                    },
+                    inplace=True
+                )
+    
+                st.subheader("📋 Engineer-wise Breakdown")
+                st.dataframe(
+                    eng_hours,
+                    use_container_width=True,
+                    hide_index=True
+                )
+    
+                st.caption(
+                    f"Dashboard data shown from {start_date} to {end_date} "
+                    f"across year sheets {start_year}–{end_year}."
+                )
 
     # ---------- LOG ----------
     with tab_log:
