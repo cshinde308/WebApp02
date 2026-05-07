@@ -17,11 +17,6 @@ def render_preview_with_multiline_notes(df, height_px=400):
     """
     df = df.copy()
 
-    # Convert newlines to <br>
-    for col in df.columns:
-        if df[col].dtype == object:
-            df[col] = df[col].fillna("").astype(str).str.replace("\n", "<br>")
-
     html_table = df.to_html(index=False, escape=False)
 
     html = f"""
@@ -47,7 +42,7 @@ def render_preview_with_multiline_notes(df, height_px=400):
             white-space: pre-wrap;
             word-wrap: break-word;
         }}
-        thread th {{
+        thead th {{
             position: sticky;
             top: 0;
             background-color: #f2f2f2;
