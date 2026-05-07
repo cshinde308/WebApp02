@@ -11,13 +11,20 @@ from datetime import date, timedelta
 # ================= HELPERS =================
 
 def render_preview_with_multiline_notes(df, height_px=400):
-    """
-    Render dataframe as scrollable HTML table using components.html()
-    (guaranteed rendering).
-    """
     df = df.copy()
 
-    html_table = df.to_html(index=False, escape=False)
+    rows_html = ""
+    for _, row in df.iterrows():
+        rows_html += "<tr>"
+        for col in df.columns:
+            val = "" if pd.isna(row[col]) else str(row[col])
+            if col.lower() == "note":
+                rows_html += f"<td><pre>{val}</pre></td>"
+            else:
+                rows_html += f"<td>{val}</td>"
+        rows_html += "</tr>"
+
+    thead_html = "".join(f"<th>{c}</th>" for c in df.columns)
 
     html = f"""
     <style>
@@ -38,9 +45,12 @@ def render_preview_with_multiline_notes(df, height_px=400):
             vertical-align: top;
             font-size: 13px;
         }}
-        td {{
+        pre {{
+            margin: 0;
             white-space: pre-wrap;
-            word-wrap: break-word;
+            word-break: break-word;
+            font-family: inherit;
+            font-size: 13px;
         }}
         thead th {{
             position: sticky;
@@ -51,7 +61,12 @@ def render_preview_with_multiline_notes(df, height_px=400):
     </style>
 
     <div class="scroll-table">
-        {html_table}
+        <table>
+            <thead><tr>{thead_html}</tr></thead>
+            <tbody>
+                {rows_html}
+            </tbody>
+        </table>
     </div>
     """
 
